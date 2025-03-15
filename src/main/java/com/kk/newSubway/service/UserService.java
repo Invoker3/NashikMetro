@@ -1,10 +1,15 @@
 package com.kk.newSubway.service;
 
+import com.kk.newSubway.dto.AddBalanceToUserAccount;
+import com.kk.newSubway.dto.DeductFareAmount;
 import com.kk.newSubway.model.Transaction;
 import com.kk.newSubway.model.User;
 import com.kk.newSubway.repository.TransactionRepository;
 import com.kk.newSubway.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -23,19 +28,32 @@ public class UserService {
     @Autowired
     private TransactionRepository transactionRepository;
 
-    public User registerUser(User user) {
+    public ResponseEntity<User> registerUser(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return userRepository.save(user);
-    }
-
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
-    }
-
-    public User addBalance(Long userId, Double amount) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
-        user.setBalance(user.getBalance() + amount);
         userRepository.save(user);
+        return ResponseEntity.ok(user);
+    }
+
+    public ResponseEntity<List<User>> getAllUsers() {
+        List<User> userList = userRepository.findAll();
+        return ResponseEntity.ok(userList);
+    }
+
+    @Transactional
+    public ResponseEntity<?> addBalance(AddBalanceToUserAccount addBalanceRequest) {
+
+        Long userId = addBalanceRequest.getUserId();
+        Double amount = addBalanceRequest.getAmount();
+
+        if (addBalanceRequest.getAmount() == null || addBalanceRequest.getAmount() <= 0) {
+            return ResponseEntity.badRequest().body("Amount must be greater than 0.");
+        }
+
+        //need to write this snippet more efficiently
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
+        }
 
         // Log transaction
         Transaction transaction = new Transaction();
@@ -45,31 +63,41 @@ public class UserService {
         transaction.setTimestamp(LocalDateTime.now());
         transactionRepository.save(transaction);
 
-        return user;
+        user.setBalance(user.getBalance() + amount);
+        User updatedUser = userRepository.save(user);
+
+        return ResponseEntity.ok(updatedUser);
     }
 
-    public Double getBalance(Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
-        return user.getBalance();
-    }
+    public ResponseEntity<?> getBalance(Long userId) {
+        User user = userRepository.findById(userId).orElse(null);
 
-    public User deductFare(Long userId, Double fare) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
-        if (user.getBalance() < fare) {
-            throw new RuntimeException("Insufficient balance");
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
         }
-        user.setBalance(user.getBalance() - fare);
+
+        return ResponseEntity.ok(user.getBalance());
+    }
+
+    public ResponseEntity<?>  deductFare(DeductFareAmount deductRequest) {
+        User user = userRepository.findById(deductRequest.getUserId()).orElse(null);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
+        }
+
+        user.setBalance(user.getBalance() - 5); //Fare fee temporarily £5
+        //need station IDs to calculate fare amount
         userRepository.save(user);
 
         // Log transaction
         Transaction transaction = new Transaction();
-        transaction.setUserId(userId);
-        transaction.setAmount(fare);
+        transaction.setUserId(user.getUserId());
+        transaction.setAmount(5D);  //Fare fee temporarily £5
         transaction.setType("DEDUCT");
         transaction.setTimestamp(LocalDateTime.now());
         transactionRepository.save(transaction);
 
-        return user;
+        return ResponseEntity.ok(user);
     }
 
 
