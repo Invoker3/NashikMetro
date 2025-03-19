@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Setter
 @Getter
@@ -17,5 +20,8 @@ public class User {
     private String email;
     private String password;
     private Double balance = 0.0; // Initialize balance to 0
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<JourneyTicket> journeyTickets = new ArrayList<>();
 
 }

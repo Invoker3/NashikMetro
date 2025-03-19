@@ -23,4 +23,9 @@ public class StationController {
     public List<Station> getAllStations() {
         return stationService.getAllStations();
     }
+
+//    @GetMapping
+//    public List<Station> getAllStationsInGivenZone(int zoneId) {
+//        return stationService.getAllStations();
+//    }
 }

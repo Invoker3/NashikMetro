@@ -20,4 +20,8 @@ public class StationService {
     public List<Station> getAllStations() {
         return stationRepository.findAll();
     }
+
+//    public List<Station> getAllStationsInGivenZone(int zoneId) {
+//        return stationRepository.findAll();
+//    }
 }

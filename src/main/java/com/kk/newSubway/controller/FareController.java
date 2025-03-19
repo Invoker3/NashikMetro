@@ -12,7 +12,7 @@ public class FareController {
     private FareService fareService;
 
     @PostMapping("/calculate")
-    public double calculateFare(@RequestParam Long startStationId, @RequestParam Long endStationId) {
+    public double calculateFare(@RequestParam int startStationId, @RequestParam int endStationId) {
         return fareService.calculateFare(startStationId, endStationId);
     }
 }

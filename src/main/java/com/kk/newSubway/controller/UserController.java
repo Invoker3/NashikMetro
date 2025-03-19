@@ -1,7 +1,6 @@
 package com.kk.newSubway.controller;
 
 import com.kk.newSubway.dto.AddBalanceToUserAccount;
-import com.kk.newSubway.dto.DeductFareAmount;
 import com.kk.newSubway.model.User;
 import com.kk.newSubway.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,8 +36,13 @@ public class UserController {
         return userService.getBalance(userId);
     }
 
-    @PostMapping("/deduct-fare")
-    public ResponseEntity<?> deductFare(@RequestBody DeductFareAmount deductRequest) {
-        return userService.deductFare(deductRequest);
+//    @PostMapping("/deduct-fare")
+//    public ResponseEntity<?> deductFare(@RequestBody DeductFare deductRequest) {
+//        return userService.deductFare(deductRequest);
+//    }
+
+    @PostMapping("/buy-ticket")
+    public ResponseEntity<?> buyTicket(@RequestBody AddBalanceToUserAccount addBalanceRequest) {
+        return userService.addBalance(addBalanceRequest);
     }
 }

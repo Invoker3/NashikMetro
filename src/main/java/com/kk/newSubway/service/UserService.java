@@ -1,7 +1,6 @@
 package com.kk.newSubway.service;
 
 import com.kk.newSubway.dto.AddBalanceToUserAccount;
-import com.kk.newSubway.dto.DeductFareAmount;
 import com.kk.newSubway.model.Transaction;
 import com.kk.newSubway.model.User;
 import com.kk.newSubway.repository.TransactionRepository;
@@ -79,26 +78,26 @@ public class UserService {
         return ResponseEntity.ok(user.getBalance());
     }
 
-    public ResponseEntity<?>  deductFare(DeductFareAmount deductRequest) {
-        User user = userRepository.findById(deductRequest.getUserId()).orElse(null);
-        if (user == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
-        }
-
-        user.setBalance(user.getBalance() - 5); //Fare fee temporarily £5
-        //need station IDs to calculate fare amount
-        userRepository.save(user);
-
-        // Log transaction
-        Transaction transaction = new Transaction();
-        transaction.setUserId(user.getUserId());
-        transaction.setAmount(5D);  //Fare fee temporarily £5
-        transaction.setType("DEDUCT");
-        transaction.setTimestamp(LocalDateTime.now());
-        transactionRepository.save(transaction);
-
-        return ResponseEntity.ok(user);
-    }
+//    public ResponseEntity<?>  deductFare(DeductFare deductRequest) {
+//        User user = userRepository.findById(deductRequest.getUserId()).orElse(null);
+//        if (user == null) {
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
+//        }
+//
+//        user.setBalance(user.getBalance() - 5); //Fare fee temporarily £5
+//        //need station IDs to calculate fare amount
+//        userRepository.save(user);
+//
+//        // Log transaction
+//        Transaction transaction = new Transaction();
+//        transaction.setUserId(user.getUserId());
+//        transaction.setAmount(5D);  //Fare fee temporarily £5
+//        transaction.setType("DEDUCT");
+//        transaction.setTimestamp(LocalDateTime.now());
+//        transactionRepository.save(transaction);
+//
+//        return ResponseEntity.ok(user);
+//    }
 
 
 

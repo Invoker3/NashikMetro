@@ -11,12 +11,12 @@ public class FareService {
     @Autowired
     private StationRepository stationRepository;
 
-    public double calculateFare(Long startStationId, Long endStationId) {
+    public double calculateFare(int startStationId, int endStationId) {
         Station startStation = stationRepository.findById(startStationId).orElseThrow();
         Station endStation = stationRepository.findById(endStationId).orElseThrow();
 
-        int startZone = startStation.getZoneId().intValue();
-        int endZone = endStation.getZoneId().intValue();
+        int startZone = startStation.getZoneId();
+        int endZone = endStation.getZoneId();
         double baseFare = 2.0; // Base fare within a zone
         double zoneFare = 1.0; // Additional fare per zone
 
