@@ -8,11 +8,11 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/fare")
 public class FareController {
 
-    @Autowired
-    private FareService fareService;
-
-    @PostMapping("/calculate")
-    public double calculateFare(@RequestParam int startStationId, @RequestParam int endStationId) {
-        return fareService.calculateFare(startStationId, endStationId);
-    }
+//    @Autowired
+//    private FareService fareService;
+//
+//    @PostMapping("/calculate")
+//    public double calculateFare(@RequestParam int startStationId, @RequestParam int endStationId) {
+//        return fareService.calculateFare(startStationId, endStationId);
+//    }
 }
