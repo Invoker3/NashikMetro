@@ -1,8 +1,11 @@
 package com.kk.newSubway.service;
 
 import com.kk.newSubway.dto.AddBalanceToUserAccount;
+import com.kk.newSubway.dto.PurchaseTicketDTO;
+import com.kk.newSubway.model.Ticket;
 import com.kk.newSubway.model.Transaction;
 import com.kk.newSubway.model.User;
+import com.kk.newSubway.repository.TicketRepository;
 import com.kk.newSubway.repository.TransactionRepository;
 import com.kk.newSubway.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -26,6 +29,9 @@ public class UserService {
 
     @Autowired
     private TransactionRepository transactionRepository;
+
+    @Autowired
+    private TicketRepository ticketRepository;
 
     public ResponseEntity<User> registerUser(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -56,7 +62,7 @@ public class UserService {
 
         // Log transaction
         Transaction transaction = new Transaction();
-        transaction.setUserId(userId);
+        transaction.setUser(user);
         transaction.setAmount(amount);
         transaction.setType("ADD");
         transaction.setTimestamp(LocalDateTime.now());
@@ -78,26 +84,33 @@ public class UserService {
         return ResponseEntity.ok(user.getBalance());
     }
 
-//    public ResponseEntity<?>  deductFare(DeductFare deductRequest) {
-//        User user = userRepository.findById(deductRequest.getUserId()).orElse(null);
-//        if (user == null) {
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
-//        }
-//
-//        user.setBalance(user.getBalance() - 5); //Fare fee temporarily £5
-//        //need station IDs to calculate fare amount
-//        userRepository.save(user);
-//
-//        // Log transaction
-//        Transaction transaction = new Transaction();
-//        transaction.setUserId(user.getUserId());
-//        transaction.setAmount(5D);  //Fare fee temporarily £5
-//        transaction.setType("DEDUCT");
-//        transaction.setTimestamp(LocalDateTime.now());
-//        transactionRepository.save(transaction);
-//
-//        return ResponseEntity.ok(user);
-//    }
+    public ResponseEntity<?> purchaseTicket(PurchaseTicketDTO ticket) {
+        User user = userRepository.findById(ticket.getUserId()).orElse(null);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
+        }
+
+        user.setBalance(user.getBalance() - 5); //Fare fee temporarily £5
+        //need station IDs to calculate fare amount
+        userRepository.save(user);
+
+        // Log transaction
+        Transaction transaction = new Transaction();
+        transaction.setUser(user);
+        transaction.setAmount(5D);  //Fare fee temporarily £5
+        transaction.setType("DEDUCT");
+        transaction.setTimestamp(LocalDateTime.now());
+        transactionRepository.save(transaction);
+
+        Ticket journeyTicket = new Ticket();
+        journeyTicket.setUser(user);
+        journeyTicket.setTimestamp(LocalDateTime.now());
+        journeyTicket.setStartStationId(ticket.getStartStationId());
+        journeyTicket.setEndStationId(ticket.getEndStationId());
+        ticketRepository.save(journeyTicket);
+
+        return ResponseEntity.status(HttpStatus.OK).body("Ticket purchased successfully.");
+    }
 
 
 

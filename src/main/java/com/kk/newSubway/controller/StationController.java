@@ -14,7 +14,7 @@ public class StationController {
     @Autowired
     private StationService stationService;
 
-    @PostMapping
+    @PostMapping("add-station")
     public Station addStation(@RequestBody Station station) {
         return stationService.addStation(station);
     }
@@ -28,4 +28,6 @@ public class StationController {
 //    public List<Station> getAllStationsInGivenZone(int zoneId) {
 //        return stationService.getAllStations();
 //    }
+
+
 }

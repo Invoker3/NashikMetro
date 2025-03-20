@@ -1,6 +1,7 @@
 package com.kk.newSubway.controller;
 
 import com.kk.newSubway.dto.AddBalanceToUserAccount;
+import com.kk.newSubway.dto.PurchaseTicketDTO;
 import com.kk.newSubway.model.User;
 import com.kk.newSubway.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,8 +42,8 @@ public class UserController {
 //        return userService.deductFare(deductRequest);
 //    }
 
-    @PostMapping("/buy-ticket")
-    public ResponseEntity<?> buyTicket(@RequestBody AddBalanceToUserAccount addBalanceRequest) {
-        return userService.addBalance(addBalanceRequest);
+    @PostMapping("/purchase-ticket")
+    public ResponseEntity<?> purchaseTicket(@RequestBody PurchaseTicketDTO ticket) {
+        return userService.purchaseTicket(ticket);
     }
 }

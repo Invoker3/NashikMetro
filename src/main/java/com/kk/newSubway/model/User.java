@@ -22,6 +22,9 @@ public class User {
     private Double balance = 0.0; // Initialize balance to 0
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<JourneyTicket> journeyTickets = new ArrayList<>();
+    private List<Ticket> tickets = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Transaction> transactions = new ArrayList<>();
 
 }

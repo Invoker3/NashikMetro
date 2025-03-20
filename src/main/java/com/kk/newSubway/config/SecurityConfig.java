@@ -20,10 +20,17 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.ignoringRequestMatchers("/api/users/add-balance")) // Disable CSRF for APIs
+                .csrf(csrf -> csrf.ignoringRequestMatchers("/api/zones/add-zone",
+                        "/api/stations/add-station",
+                        "/api/users/add-balance",
+                        "/api/users/purchase-ticket")) // Disable CSRF for APIs
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/users").permitAll()
-                        .requestMatchers("/api/users/**").permitAll()// Allow registration without authentication
+                        .requestMatchers("/api/users/**").permitAll()
+                        .requestMatchers("/api/zones").permitAll()
+                        .requestMatchers("/api/zones/**").permitAll()
+                        .requestMatchers("/api/stations").permitAll()
+                        .requestMatchers("/api/stations/**").permitAll()// Allow registration without authentication
                         .anyRequest().authenticated() // Secure all other endpoints
                 ); // Use HTTP Basic Authentication (or customize as needed)
 

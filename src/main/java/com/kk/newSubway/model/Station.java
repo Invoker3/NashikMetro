@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @Entity
@@ -14,6 +16,8 @@ public class Station {
     private int stationId;
 
     private String name;
-    private int zoneId;
 
+    @ManyToOne
+    @JoinColumn(name = "zone_id", nullable = false) // Foreign key column in 'stations' table
+    private Zone zone;
 }

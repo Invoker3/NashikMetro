@@ -15,9 +15,13 @@ public class Transaction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long transactionId;
 
-    private Long userId;
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false) // Foreign key reference
+    private User user;
+
     private Double amount;
     private String type; // "ADD" or "DEDUCT"
     private LocalDateTime timestamp;
+
 
 }

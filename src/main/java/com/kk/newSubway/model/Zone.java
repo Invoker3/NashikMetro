@@ -3,6 +3,9 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 @Setter
 @Entity
@@ -14,4 +17,6 @@ public class Zone {
 
     private String name;
 
+    @OneToMany(mappedBy = "zone", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Station> stations = new ArrayList<>();
 }
