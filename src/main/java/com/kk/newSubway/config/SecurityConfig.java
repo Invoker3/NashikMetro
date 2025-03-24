@@ -23,7 +23,8 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.ignoringRequestMatchers("/api/zones/add-zone",
                         "/api/stations/add-station",
                         "/api/users/add-balance",
-                        "/api/users/purchase-ticket")) // Disable CSRF for APIs
+                        "/api/users/purchase-ticket",
+                        "/api/zones/add-zone")) // Disable CSRF for APIs
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/users").permitAll()
                         .requestMatchers("/api/users/**").permitAll()

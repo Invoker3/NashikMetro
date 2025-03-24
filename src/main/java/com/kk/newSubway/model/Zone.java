@@ -1,4 +1,5 @@
 package com.kk.newSubway.model;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,6 +18,7 @@ public class Zone {
 
     private String name;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "zone", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Station> stations = new ArrayList<>();
 }
