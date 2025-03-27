@@ -1,6 +1,8 @@
 package com.kk.newSubway.controller;
 
 import com.kk.newSubway.dto.AddBalanceToUserAccount;
+import com.kk.newSubway.dto.AuthResponse;
+import com.kk.newSubway.dto.LoginRequest;
 import com.kk.newSubway.dto.PurchaseTicketDTO;
 import com.kk.newSubway.model.User;
 import com.kk.newSubway.service.UserService;
@@ -18,7 +20,7 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/register")
-    public ResponseEntity<User> registerUser(@RequestBody User user) {
+    public ResponseEntity<?> registerUser(@RequestBody User user) {
         return userService.registerUser(user);
     }
 
@@ -45,5 +47,10 @@ public class UserController {
     @PostMapping("/purchase-ticket")
     public ResponseEntity<?> purchaseTicket(@RequestBody PurchaseTicketDTO ticket) {
         return userService.purchaseTicket(ticket);
+    }
+
+    @PostMapping("/login")
+    public AuthResponse login(@RequestBody LoginRequest request) {
+        return userService.login(request);
     }
 }

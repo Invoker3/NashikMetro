@@ -1,6 +1,8 @@
 package com.kk.newSubway.service;
 
 import com.kk.newSubway.dto.AddBalanceToUserAccount;
+import com.kk.newSubway.dto.AuthResponse;
+import com.kk.newSubway.dto.LoginRequest;
 import com.kk.newSubway.dto.PurchaseTicketDTO;
 import com.kk.newSubway.model.Ticket;
 import com.kk.newSubway.model.Transaction;
@@ -8,18 +10,25 @@ import com.kk.newSubway.model.User;
 import com.kk.newSubway.repository.TicketRepository;
 import com.kk.newSubway.repository.TransactionRepository;
 import com.kk.newSubway.repository.UserRepository;
+import com.kk.newSubway.util.JwtUtil;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserService {
+
+
 
     @Autowired
     private UserRepository userRepository;
@@ -33,7 +42,17 @@ public class UserService {
     @Autowired
     private TicketRepository ticketRepository;
 
-    public ResponseEntity<User> registerUser(User user) {
+    private final JwtUtil jwtUtil;
+
+    public UserService(JwtUtil jwtUtil) {
+        this.jwtUtil = jwtUtil;
+    }
+
+
+    public ResponseEntity<?> registerUser(User user) {
+        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Email already exists!");
+        }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
         return ResponseEntity.ok(user);
@@ -112,7 +131,17 @@ public class UserService {
         return ResponseEntity.status(HttpStatus.OK).body("Ticket purchased successfully.");
     }
 
+    public AuthResponse login(LoginRequest request) {
+        Optional<User> userOpt = userRepository.findByEmail(request.getEmail());
 
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            if (passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+                return new AuthResponse("Login Successful!");
+            }
+        }
+        return new AuthResponse("Invalid email or password");
+    }
 
 
 }
