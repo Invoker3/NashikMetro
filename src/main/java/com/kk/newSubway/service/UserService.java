@@ -1,9 +1,6 @@
 package com.kk.newSubway.service;
 
-import com.kk.newSubway.dto.AddBalanceToUserAccount;
-import com.kk.newSubway.dto.AuthResponse;
-import com.kk.newSubway.dto.LoginRequest;
-import com.kk.newSubway.dto.PurchaseTicketDTO;
+import com.kk.newSubway.dto.*;
 import com.kk.newSubway.model.Ticket;
 import com.kk.newSubway.model.Transaction;
 import com.kk.newSubway.model.User;
@@ -12,23 +9,20 @@ import com.kk.newSubway.repository.TransactionRepository;
 import com.kk.newSubway.repository.UserRepository;
 import com.kk.newSubway.util.JwtUtil;
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 @Service
+@Slf4j
 public class UserService {
-
-
 
     @Autowired
     private UserRepository userRepository;
@@ -109,16 +103,20 @@ public class UserService {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
         }
 
+        if (user.getBalance() < 5) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Insufficient balance. Please add funds.");
+        }
+
         user.setBalance(user.getBalance() - 5); //Fare fee temporarily £5
         //need station IDs to calculate fare amount
         userRepository.save(user);
-
+        LocalDateTime time = LocalDateTime.now();
         // Log transaction
         Transaction transaction = new Transaction();
         transaction.setUser(user);
         transaction.setAmount(5D);  //Fare fee temporarily £5
-        transaction.setType("DEDUCT");
-        transaction.setTimestamp(LocalDateTime.now());
+        transaction.setType("PURCHASED TICKET");
+        transaction.setTimestamp(time);
         transactionRepository.save(transaction);
 
         Ticket journeyTicket = new Ticket();
@@ -128,7 +126,11 @@ public class UserService {
         journeyTicket.setEndStationId(ticket.getEndStationId());
         ticketRepository.save(journeyTicket);
 
-        return ResponseEntity.status(HttpStatus.OK).body("Ticket purchased successfully.");
+        return ResponseEntity.status(HttpStatus.OK).body(new TicketPurchaseConfirmationDTO(
+                transaction.getTransactionId(),
+                ticket.getStartStationId(),
+                ticket.getEndStationId(),
+                time));
     }
 
     public AuthResponse login(LoginRequest request) {
@@ -137,10 +139,10 @@ public class UserService {
         if (userOpt.isPresent()) {
             User user = userOpt.get();
             if (passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-                return new AuthResponse("Login Successful!");
+                return new AuthResponse("Login Successful!", user.getUserId());
             }
         }
-        return new AuthResponse("Invalid email or password");
+        return new AuthResponse("Invalid email or password", 0L);
     }
 
 

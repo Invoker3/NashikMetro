@@ -15,14 +15,17 @@ import {
     Snackbar
 } from "@mui/material";
 import DirectionsSubwayIcon from '@mui/icons-material/DirectionsSubway';
+import PersonIcon from '@mui/icons-material/Person';
 import EmailIcon from '@mui/icons-material/Email';
 import LockIcon from '@mui/icons-material/Lock';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
-const UserLogin = ({ setAuth }) => {
+const UserRegistration = ({ setAuth }) => {
+    const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState("");
@@ -33,30 +36,35 @@ const UserLogin = ({ setAuth }) => {
         setShowPassword(!showPassword);
     };
 
-    const handleLogin = async (e) => {
+    const handleRegister = async (e) => {
         e.preventDefault();
+
+        if (password !== confirmPassword) {
+            setError("Passwords do not match");
+            return;
+        }
+
         setIsLoading(true);
         setError("");
 
         try {
-            const response = await axios.post("http://localhost:8080/api/users/login", { email, password });
+            const response = await axios.post("http://localhost:8080/api/users/register", {
+                name,
+                email,
+                password,
+            });
 
-            if (response.data.token === "Login Successful!") {
-                localStorage.setItem("token", response.data.token);
-                localStorage.setItem("userId", response.data.userId);
+            console.log("New User: " + response);
+            setOpenSnackbar(true);
 
-                setOpenSnackbar(true);
-
-                // Give a slight delay for nice UX
-                setTimeout(() => {
-                    navigate("/");
-                }, 1000);
-            } else {
-                setError("Invalid credentials");
-            }
+            // Give a slight delay for nice UX
+            setTimeout(() => {
+                setAuth(true);
+                navigate("/");
+            }, 1500);
         } catch (error) {
             console.log(error);
-            setError(error.response?.data || "Login failed. Please try again.");
+            setError(error.response?.data || "Registration failed. Please try again.");
         } finally {
             setIsLoading(false);
         }
@@ -107,10 +115,10 @@ const UserLogin = ({ setAuth }) => {
                         </Box>
 
                         <Typography variant="h5" component="h2">
-                            Welcome Back
+                            Create Account
                         </Typography>
                         <Typography variant="body2" color="textSecondary" sx={{ mt: 1 }}>
-                            Sign in to continue to your account
+                            Sign up to book your subway tickets
                         </Typography>
                     </Box>
 
@@ -120,7 +128,24 @@ const UserLogin = ({ setAuth }) => {
                         </Alert>
                     )}
 
-                    <form onSubmit={handleLogin}>
+                    <form onSubmit={handleRegister}>
+                        <TextField
+                            fullWidth
+                            label="Full Name"
+                            variant="outlined"
+                            margin="normal"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            required
+                            InputProps={{
+                                startAdornment: (
+                                    <InputAdornment position="start">
+                                        <PersonIcon color="action" />
+                                    </InputAdornment>
+                                ),
+                            }}
+                        />
+
                         <TextField
                             fullWidth
                             label="Email"
@@ -168,6 +193,24 @@ const UserLogin = ({ setAuth }) => {
                             }}
                         />
 
+                        <TextField
+                            fullWidth
+                            label="Confirm Password"
+                            type={showPassword ? 'text' : 'password'}
+                            variant="outlined"
+                            margin="normal"
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            required
+                            InputProps={{
+                                startAdornment: (
+                                    <InputAdornment position="start">
+                                        <LockIcon color="action" />
+                                    </InputAdornment>
+                                ),
+                            }}
+                        />
+
                         <Button
                             fullWidth
                             type="submit"
@@ -186,7 +229,7 @@ const UserLogin = ({ setAuth }) => {
                                 }
                             }}
                         >
-                            {isLoading ? 'Signing in...' : 'Login'}
+                            {isLoading ? 'Creating Account...' : 'Register'}
                         </Button>
                     </form>
 
@@ -198,14 +241,14 @@ const UserLogin = ({ setAuth }) => {
 
                     <Box sx={{ textAlign: 'center' }}>
                         <Typography variant="body1">
-                            New user?
-                            <Link to="/register" style={{
+                            Already have an account?
+                            <Link to="/login" style={{
                                 marginLeft: '8px',
                                 color: '#1976d2',
                                 textDecoration: 'none',
                                 fontWeight: 'medium'
                             }}>
-                                Create an account
+                                Sign in
                             </Link>
                         </Typography>
                     </Box>
@@ -216,10 +259,10 @@ const UserLogin = ({ setAuth }) => {
                 open={openSnackbar}
                 autoHideDuration={3000}
                 onClose={() => setOpenSnackbar(false)}
-                message="Login successful!"
+                message="Registration successful!"
             />
         </Box>
     );
 };
 
-export default UserLogin;
+export default UserRegistration;
