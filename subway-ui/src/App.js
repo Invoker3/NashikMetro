@@ -4,7 +4,7 @@ import Home from "./pages/Home";
 import UserLogin from './pages/UserLogin';
 import UserRegistration from './pages/UserRegistration';
 import TicketSuccess from './pages/TicketSuccess';
-import './App.css'; // We'll create this file for global styles
+import './App.css';
 
 const App = () => {
     const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem("token")); // Check if user is logged in

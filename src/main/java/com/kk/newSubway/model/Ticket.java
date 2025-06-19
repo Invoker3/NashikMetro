@@ -1,6 +1,7 @@
 package com.kk.newSubway.model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -23,6 +24,7 @@ public class Ticket {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false) // Foreign key reference
+    @JsonIgnore
     private User user;
 
     private int startStationId;

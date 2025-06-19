@@ -1,5 +1,6 @@
 package com.kk.newSubway.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,6 +18,7 @@ public class Transaction {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false) // Foreign key reference
+    @JsonIgnore
     private User user;
 
     private Double amount;
