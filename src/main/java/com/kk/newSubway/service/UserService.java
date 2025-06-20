@@ -139,10 +139,10 @@ public class UserService {
         if (userOpt.isPresent()) {
             User user = userOpt.get();
             if (passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-                return new AuthResponse("Login Successful!", user.getUserId());
+                return new AuthResponse("Login Successful!", user.getUserId(), user.getBalance());
             }
         }
-        return new AuthResponse("Invalid email or password", 0L);
+        return new AuthResponse("Invalid email or password", 0L, 0D);
     }
 
 
