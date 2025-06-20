@@ -41,22 +41,29 @@ const UserLogin = ({ setAuth }) => {
         try {
             const response = await axios.post("http://localhost:8080/api/users/login", { email, password });
 
-            if (response.data.token === "Login Successful!") {
+            // Note: Storing a confirmation message like "Login Successful!" as a token
+            // is not secure. This should be replaced with an actual JWT token from the backend.
+            console.log("response: "+response.data.token);
+            if (response.data.token.includes("Login Successful!")) {
+
                 localStorage.setItem("token", response.data.token);
                 localStorage.setItem("userId", response.data.userId);
+                localStorage.setItem("balance", response.data.balance);
+                
+                // This is the crucial step: update the authentication state in the App component
+                setAuth(true);
 
                 setOpenSnackbar(true);
 
-                // Give a slight delay for nice UX
+                // Navigate to home after a short delay for better user experience
                 setTimeout(() => {
                     navigate("/");
                 }, 1000);
             } else {
-                setError("Invalid credentials");
+                setError(response.data.message || "Invalid credentials");
             }
         } catch (error) {
-            console.log(error);
-            setError(error.response?.data || "Login failed. Please try again.");
+            setError(error.response?.data?.message || "Login failed. Please try again.");
         } finally {
             setIsLoading(false);
         }

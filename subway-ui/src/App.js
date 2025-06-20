@@ -7,62 +7,61 @@ import TicketSuccess from './pages/TicketSuccess';
 import './App.css';
 
 const App = () => {
-    const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem("token")); // Check if user is logged in
+    const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem("token"));
 
     useEffect(() => {
-        const checkAuth = () => setIsAuthenticated(!!localStorage.getItem("token"));
-        window.addEventListener("storage", checkAuth); // Detects login/logout across tabs
-        return () => window.removeEventListener("storage", checkAuth);
+        const handleStorageChange = () => {
+            setIsAuthenticated(!!localStorage.getItem("token"));
+        };
+        // Listen for changes in localStorage to sync auth state across tabs
+        window.addEventListener('storage', handleStorageChange);
+        return () => {
+            window.removeEventListener('storage', handleStorageChange);
+        };
     }, []);
 
+    // A wrapper for routes that require a user to be logged in
+    const ProtectedRoute = ({ children }) => {
+        if (!isAuthenticated) {
+            // If not authenticated, redirect to the login page
+            return <Navigate to="/login" replace />;
+        }
+        return children;
+    };
+
     return (
-        <div className="app-wrapper" style={{
-            backgroundImage: 'url("/images/subway-background.jpg")', // Update with your actual image path
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundAttachment: 'fixed',
-            minHeight: '100vh',
-            position: 'relative'
-        }}>
-            <div className="content-overlay" style={{
-                backgroundColor: 'rgba(0, 0, 30, 0.7)', // Dark blue-tinted overlay
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                zIndex: 0
-            }}>
-                <div className="content-container" style={{
-                    position: 'relative',
-                    zIndex: 1,
-                    padding: '20px',
-                    minHeight: '100vh',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                }}>
-                    <Router>
-                        <Routes>
-                            <Route path="/" element={<Home />} /> {/* Default page */}
-                            <Route
-                                path="/login"
-                                element={isAuthenticated ? <Navigate to="/" /> : <UserLogin />}
-                            />
-                            <Route
-                                path="/register"
-                                element={isAuthenticated ? <Navigate to="/" /> : <UserRegistration />}
-                            />
-                            <Route
-                                path="/confirmation"
-                                element={<TicketSuccess />}
-                            />
-                        </Routes>
-                    </Router>
-                </div>
-            </div>
-        </div>
+        <Router>
+            <Routes>
+                {/* Public Routes */}
+                <Route
+                    path="/login"
+                    // If already authenticated, redirect to home
+                    element={isAuthenticated ? <Navigate to="/" /> : <UserLogin setAuth={setIsAuthenticated} />}
+                />
+                <Route
+                    path="/register"
+                    element={isAuthenticated ? <Navigate to="/" /> : <UserRegistration setAuth={setIsAuthenticated} /> }
+                />
+
+                {/* Protected Routes */}
+                <Route
+                    path="/"
+                    element={
+                        <ProtectedRoute>
+                            <Home setAuth={setIsAuthenticated} isAuthenticated={isAuthenticated} />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/confirmation"
+                    element={
+                        <ProtectedRoute>
+                            <TicketSuccess />
+                        </ProtectedRoute>
+                    }
+                />
+            </Routes>
+        </Router>
     );
 };
 
