@@ -1,9 +1,14 @@
 package com.kk.newSubway.model;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.time.LocalDateTime;
 
 @Entity
+@Getter
+@Setter
 public class TravelLog {
 
     @Id
@@ -16,52 +21,4 @@ public class TravelLog {
     private LocalDateTime travelDate;
     private Double fare;
 
-    // Getters and Setters
-    public Long getTravelId() {
-        return travelId;
-    }
-
-    public void setTravelId(Long travelId) {
-        this.travelId = travelId;
-    }
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
-
-    public Long getStartStationId() {
-        return startStationId;
-    }
-
-    public void setStartStationId(Long startStationId) {
-        this.startStationId = startStationId;
-    }
-
-    public Long getEndStationId() {
-        return endStationId;
-    }
-
-    public void setEndStationId(Long endStationId) {
-        this.endStationId = endStationId;
-    }
-
-    public LocalDateTime getTravelDate() {
-        return travelDate;
-    }
-
-    public void setTravelDate(LocalDateTime travelDate) {
-        this.travelDate = travelDate;
-    }
-
-    public Double getFare() {
-        return fare;
-    }
-
-    public void setFare(Double fare) {
-        this.fare = fare;
-    }
 }

@@ -1,6 +1,5 @@
 package com.kk.newSubway.model;
 
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -30,6 +29,5 @@ public class Ticket {
     private int startStationId;
     private int endStationId;
     private LocalDateTime timestamp;
-
 
 }

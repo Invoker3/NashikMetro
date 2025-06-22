@@ -2,7 +2,6 @@ package com.kk.newSubway.service;
 
 import com.kk.newSubway.model.Zone;
 import com.kk.newSubway.repository.ZoneRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -12,8 +11,11 @@ import java.util.List;
 @Service
 public class ZoneService {
 
-    @Autowired
-    private ZoneRepository zoneRepository;
+    private final ZoneRepository zoneRepository;
+
+    public ZoneService(ZoneRepository zoneRepository) {
+        this.zoneRepository = zoneRepository;
+    }
 
     public ResponseEntity<?> addZone(Zone zone) {
         zoneRepository.save(zone);
@@ -30,7 +32,5 @@ public class ZoneService {
         }
     }
 
-    public ResponseEntity<List<Zone>> getAllZones() {
-        return ResponseEntity.ok(zoneRepository.findAll());
-    }
+    public ResponseEntity<List<Zone>> getAllZones() { return ResponseEntity.ok(zoneRepository.findAll()); }
 }

@@ -7,10 +7,8 @@ import com.kk.newSubway.model.User;
 import com.kk.newSubway.repository.TicketRepository;
 import com.kk.newSubway.repository.TransactionRepository;
 import com.kk.newSubway.repository.UserRepository;
-import com.kk.newSubway.util.JwtUtil;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,30 +16,23 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Slf4j
 public class UserService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final TransactionRepository transactionRepository;
+    private final TicketRepository ticketRepository;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private TransactionRepository transactionRepository;
-
-    @Autowired
-    private TicketRepository ticketRepository;
-
-    private final JwtUtil jwtUtil;
-
-    public UserService(JwtUtil jwtUtil) {
-        this.jwtUtil = jwtUtil;
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder,
+                       TransactionRepository transactionRepository, TicketRepository ticketRepository) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.transactionRepository = transactionRepository;
+        this.ticketRepository = ticketRepository;
     }
-
 
     public ResponseEntity<?> registerUser(User user) {
         if (userRepository.findByEmail(user.getEmail()).isPresent()) {
@@ -60,15 +51,14 @@ public class UserService {
     @Transactional
     public ResponseEntity<?> addBalance(AddBalanceToUserAccount addBalanceRequest) {
 
-        Long userId = addBalanceRequest.getUserId();
         Double amount = addBalanceRequest.getAmount();
 
-        if (addBalanceRequest.getAmount() == null || addBalanceRequest.getAmount() <= 0) {
+        if (amount == null || amount <= 0) {
             return ResponseEntity.badRequest().body("Amount must be greater than 0.");
         }
 
         //need to write this snippet more efficiently
-        User user = userRepository.findById(userId).orElse(null);
+        User user = userRepository.findById(addBalanceRequest.getUserId()).orElse(null);
         if (user == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
         }
@@ -110,6 +100,7 @@ public class UserService {
         user.setBalance(user.getBalance() - 5); //Fare fee temporarily £5
         //need station IDs to calculate fare amount
         userRepository.save(user);
+
         LocalDateTime time = LocalDateTime.now();
         // Log transaction
         Transaction transaction = new Transaction();
@@ -121,7 +112,7 @@ public class UserService {
 
         Ticket journeyTicket = new Ticket();
         journeyTicket.setUser(user);
-        journeyTicket.setTimestamp(LocalDateTime.now());
+        journeyTicket.setTimestamp(time);
         journeyTicket.setStartStationId(ticket.getStartStationId());
         journeyTicket.setEndStationId(ticket.getEndStationId());
         ticketRepository.save(journeyTicket);
@@ -134,13 +125,10 @@ public class UserService {
     }
 
     public AuthResponse login(LoginRequest request) {
-        Optional<User> userOpt = userRepository.findByEmail(request.getEmail());
 
-        if (userOpt.isPresent()) {
-            User user = userOpt.get();
-            if (passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-                return new AuthResponse("Login Successful!", user.getUserId(), user.getBalance());
-            }
+        User user = userRepository.findByEmail(request.getEmail()).orElse(null);
+        if (user != null && passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            return new AuthResponse("Login Successful!", user.getUserId(), user.getBalance());
         }
         return new AuthResponse("Invalid email or password", 0L, 0D);
     }

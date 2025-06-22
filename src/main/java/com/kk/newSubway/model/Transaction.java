@@ -25,5 +25,4 @@ public class Transaction {
     private String type; // "ADD" or "DEDUCT"
     private LocalDateTime timestamp;
 
-
 }

@@ -11,23 +11,17 @@ import java.util.List;
 @RequestMapping("/api/stations")
 public class StationController {
 
+    private final StationService stationService;
+
     @Autowired
-    private StationService stationService;
+    public StationController(StationService stationService) {
+        this.stationService = stationService;
+    }
 
     @PostMapping("add-station")
-    public Station addStation(@RequestBody Station station) {
-        return stationService.addStation(station);
-    }
+    public Station addStation(@RequestBody Station station) { return stationService.addStation(station); }
 
     @GetMapping
-    public List<Station> getAllStations() {
-        return stationService.getAllStations();
-    }
-
-//    @GetMapping
-//    public List<Station> getAllStationsInGivenZone(int zoneId) {
-//        return stationService.getAllStations();
-//    }
-
+    public List<Station> getAllStations() { return stationService.getAllStations(); }
 
 }

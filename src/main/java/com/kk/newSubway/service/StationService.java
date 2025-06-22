@@ -10,18 +10,17 @@ import java.util.List;
 @Service
 public class StationService {
 
+    private final StationRepository stationRepository;
+
     @Autowired
-    private StationRepository stationRepository;
+    StationService(StationRepository stationRepository) {
+        this.stationRepository = stationRepository;
+    }
 
     public Station addStation(Station station) {
         return stationRepository.save(station);
     }
 
-    public List<Station> getAllStations() {
-        return stationRepository.findAll();
-    }
+    public List<Station> getAllStations() { return stationRepository.findAll(); }
 
-//    public List<Station> getAllStationsInGivenZone(int zoneId) {
-//        return stationRepository.findAll();
-//    }
 }
