@@ -12,7 +12,7 @@ L.Icon.Default.mergeOptions({
     shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
 });
 
-const INITIAL_ZOOM = 12; // Initial zoom level, zoomed out
+const INITIAL_ZOOM = 13; // Initial zoom level, zoomed out
 const INITIAL_CENTER = [19.98, 73.78]; // Approximate center of your provided coordinates
 
 // Custom hook to handle map animations and view changes
